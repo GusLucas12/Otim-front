@@ -100,7 +100,7 @@ export class OptimizerComponent {
 
       console.log('Payload gráfico:', payload);
 
-      this.http.post('http://localhost:8000/grafico', payload, { responseType: 'blob' }).subscribe({
+      this.http.post('https://otim-backend.onrender.com/grafico', payload, { responseType: 'blob' }).subscribe({
         next: (response) => {
           const reader = new FileReader();
           reader.readAsDataURL(response);
@@ -125,7 +125,7 @@ export class OptimizerComponent {
 
       this.simplexSubmitted = true;
 
-      this.http.post<SimplexResponse>('http://localhost:8000/simplex', payload).subscribe({
+      this.http.post<SimplexResponse>('https://otim-backend.onrender.com/simplex', payload).subscribe({
         next: (response) => {
           console.log('Resposta simplex:', response);
           if (response.status === 'success') {
