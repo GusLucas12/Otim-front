@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-
+import { OptimizerComponent } from './components/optimizer/optimizer.component';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet,OptimizerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

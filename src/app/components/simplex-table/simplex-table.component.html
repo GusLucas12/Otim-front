@@ -1,0 +1,22 @@
+<div *ngIf="tableData">
+
+    <table border="1" cellpadding="8" cellspacing="0">
+      <thead>
+        <tr>
+          <th *ngFor="let header of tableData.headers">{{ header }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of tableData.matrix">
+          <td *ngFor="let value of row">{{ value }}</td>
+        </tr>
+        <tr>
+          <td *ngFor="let value of tableData.objectiveRow"><strong>{{ value }}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div *ngIf="!tableData">
+    Nenhuma tabela para exibir.
+  </div>
+  

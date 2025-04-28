@@ -1,0 +1,95 @@
+<div class="container">
+    <h1>Problema de Otimização</h1>
+
+    <div class="section">
+        <label for="numVariables">Número de Variáveis:</label>
+        <input type="number" id="numVariables" [(ngModel)]="numVariables" (change)="updateVariables()" min="1">
+    </div>
+
+    <div class="section">
+        <h2>Função Objetivo</h2>
+        <div class="variables">
+            <div *ngFor="let coef of objective; let i = index">
+                <input type="number" [(ngModel)]="objective[i]" placeholder="Coeficiente de x{{i+1}}">
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Restrições</h2>
+        <div *ngFor="let constraint of constraints; let i = index" class="constraint"
+            style="display: flex; align-items: center; gap: 10px;">
+            <div class="variables" style="display: flex; gap: 5px;">
+                <div *ngFor="let coef of constraint.coefficients; let j = index">
+                    <input type="number" [(ngModel)]="constraint.coefficients[j]" placeholder="Coef x{{j+1}}">
+                </div>
+            </div>
+
+            <select [(ngModel)]="constraint.operator">
+                <option value="<=">&le;</option>
+                <option value=">=">&ge;</option>
+                <option value="=">=</option>
+            </select>
+
+            <input type="number" [(ngModel)]="constraint.rhs" placeholder="Resultado">
+
+            <button type="button" class="delete-btn" (click)="removeConstraint(i)">Excluir</button>
+        </div>
+
+
+
+        <div style="margin-top: 10px;">
+            <button class="add-btn" (click)="addConstraint()">Adicionar Restrição</button>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <h2>Método</h2>
+        <select [(ngModel)]="method">
+            <option value="">Selecione o método</option>
+            <option value="grafico" [disabled]="numVariables > 2">Gráfico</option>
+            <option value="simplex">Simplex</option>
+            <option value="heuristico">Heurístico</option>
+        </select>
+    </div>
+
+    <div class="section">
+        <h2>Objetivo</h2>
+        <label>
+            <input type="radio" [(ngModel)]="maximize" [value]="true"> Maximizar
+        </label>
+        <label>
+            <input type="radio" [(ngModel)]="maximize" [value]="false"> Minimizar
+        </label>
+    </div>
+
+    <button class="submit-btn" (click)="submit()">Resolver</button>
+
+    <!-- Novo: Mostrar o SimplexTableComponent quando for simplex -->
+    <div *ngIf="method === 'simplex' && simplexSubmitted" class="section">
+        <h2>Tabela do Simplex:</h2>
+        <app-simplex-table [inputData]="simplexInputData"></app-simplex-table>
+    </div>
+
+    <div *ngIf="imageSrc">
+        <h3>Gráfico:</h3>
+        <img [src]="imageSrc" alt="Gráfico de Solução" style="max-width: 100%; height: auto;">
+    </div>
+
+    <div *ngIf="!imageSrc && solution.length > 0">
+        <h3>Solução Simplex:</h3>
+        <ul>
+            <li *ngFor="let value of solution; let idx = index">
+                x{{idx+1}} = {{ value | number:'1.2-2' }}
+            </li>
+        </ul>
+        <p><strong>Valor ótimo:</strong> {{ optimalValue | number:'1.2-2' }}</p>
+        <p><strong>Mensagem:</strong> {{ message }}</p>
+    </div>
+
+    <div *ngIf="!imageSrc && solution.length === 0 && message">
+        <h3>Erro:</h3>
+        <p>{{ message }}</p>
+    </div>
+</div>
