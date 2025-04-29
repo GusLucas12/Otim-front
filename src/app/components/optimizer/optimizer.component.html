@@ -50,7 +50,6 @@
             <option value="">Selecione o método</option>
             <option value="grafico" [disabled]="numVariables > 2">Gráfico</option>
             <option value="simplex">Simplex</option>
-            <option value="heuristico">Heurístico</option>
         </select>
     </div>
 
@@ -66,12 +65,16 @@
 
     <button class="submit-btn" (click)="submit()">Resolver</button>
 
-    <!-- Novo: Mostrar o SimplexTableComponent quando for simplex -->
+
     <div *ngIf="method === 'simplex' && simplexSubmitted" class="section">
         <h2>Tabela do Simplex:</h2>
         <app-simplex-table [inputData]="simplexInputData"></app-simplex-table>
     </div>
-
+    <div *ngIf="isLoading" class="loading-overlay">
+        <p *ngIf="!showWakeMessage">Carregando... Por favor, aguarde.</p>
+        <p *ngIf="showWakeMessage">Aguarde um pouco, servidor acordando 😴...</p>
+        <div class="spinner"></div>
+    </div>
     <div *ngIf="imageSrc">
         <h3>Gráfico:</h3>
         <img [src]="imageSrc" alt="Gráfico de Solução" style="max-width: 100%; height: auto;">

@@ -1,6 +1,8 @@
 // src/environments/environment.ts
 export const environment = {
-    production: false,
-    apiUrl: 'https://otim-backend.onrender.com' 
+    production: true,
+    apiUrl: 'https://otim-backend.onrender.com',
+    apiUrlGraficos: 'https://otim-backend.onrender.com/grafico',
+    apiUrlSimplex:'https://otim-backend.onrender.com/simplex'
   };
   

@@ -3,6 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { SimplexTableComponent } from '../simplex-table/simplex-table.component'; // IMPORTAR O COMPONENTE!
+import { environment } from '../../../environments/enviroment';
 
 interface SimplexResponse {
   status: string;
@@ -28,8 +29,11 @@ interface SimplexInput {
 export class OptimizerComponent {
   numVariables: number = 2;
   objective: number[] = [0, 0];
+  isLoading: boolean = false;
+  showWakeMessage: boolean = false;
+  private loadingTimeout: any;
   maximize: boolean = true;
-  constraints: { coefficients: number[]; operator: '>=' | '<=' | '='; rhs: number }[] = []; 
+  constraints: { coefficients: number[]; operator: '>=' | '<=' | '='; rhs: number }[] = [];
   method: string = 'simplex';
   result: any = null;
   imageSrc: string | null = null;
@@ -51,7 +55,7 @@ export class OptimizerComponent {
   addConstraint() {
     this.constraints.push({
       coefficients: new Array(this.numVariables).fill(0),
-      operator: '<=',  
+      operator: '<=',
       rhs: 0
     });
   }
@@ -60,7 +64,7 @@ export class OptimizerComponent {
     return {
       c: this.objective,
       A: this.constraints.map(c => c.coefficients),
-      operador: this.constraints.map(c => this.operatorToNumber(c.operator)), // Convertendo para número
+      operador: this.constraints.map(c => this.operatorToNumber(c.operator)), 
       b: this.constraints.map(c => c.rhs),
       maximize: this.maximize
     };
@@ -92,16 +96,21 @@ export class OptimizerComponent {
     }
 
     if (this.method === 'grafico') {
-      const payload = {
-        c: this.objective,
-        A: this.constraints.map(c => c.coefficients),
-        b: this.constraints.map(c => c.rhs)
-      };
+    
+      const payload = this.buildSimplexTable();
 
       console.log('Payload gráfico:', payload);
+      this.isLoading = true;
+      this.showWakeMessage = false;
 
-      this.http.post('https://otim-backend.onrender.com/grafico', payload, { responseType: 'blob' }).subscribe({
+      this.loadingTimeout = setTimeout(() => {
+        this.showWakeMessage = true;
+      }, 5000);
+      this.http.post(environment.apiUrlGraficos, payload, { responseType: 'blob' }).subscribe({
         next: (response) => {
+          this.isLoading = false;
+          clearTimeout(this.loadingTimeout);
+          this.showWakeMessage = false;
           const reader = new FileReader();
           reader.readAsDataURL(response);
           reader.onloadend = () => {
@@ -117,16 +126,25 @@ export class OptimizerComponent {
       this.simplexInputData = {
         c: [...this.objective],
         A: this.constraints.map(constraint => [...constraint.coefficients]),
-        operador: this.constraints.map(constraint => this.operatorToNumber(constraint.operator)), // Convertendo para número
+        operador: this.constraints.map(constraint => this.operatorToNumber(constraint.operator)), 
         b: this.constraints.map(constraint => constraint.rhs),
         maximize: this.maximize
       };
       console.log('Payload simplex:', payload);
 
       this.simplexSubmitted = true;
+      this.isLoading = true;
+      this.showWakeMessage = false;
 
-      this.http.post<SimplexResponse>('https://otim-backend.onrender.com/simplex', payload).subscribe({
+      this.loadingTimeout = setTimeout(() => {
+        this.showWakeMessage = true;
+      }, 5000);
+      this.http.post<SimplexResponse>(environment.apiUrlSimplex, payload).subscribe({
         next: (response) => {
+
+          this.isLoading = false;
+          clearTimeout(this.loadingTimeout);
+          this.showWakeMessage = false;
           console.log('Resposta simplex:', response);
           if (response.status === 'success') {
             this.solution = response.solution ?? [];
